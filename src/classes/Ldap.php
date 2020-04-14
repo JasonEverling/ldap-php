@@ -242,19 +242,8 @@ class Ldap
      * @return bool Returns result, true or false if changed
      */
     public function setPassword($uuid, $new_password) {
-        $this->connect();
-        $con = $this->getLdapConnection();
-        $user_dn = $this->getLdapAttribute($uuid, 'distinguishedname', 'person');
         $unicodePwd = iconv('UTF-8', 'UTF-16LE', '"' . $new_password . '"');
-        $modify_op = [
-            [
-                'attrib'  => 'unicodePwd',
-                'modtype' => LDAP_MODIFY_BATCH_REPLACE,
-                'values'  => [$unicodePwd],
-            ],
-        ];
-        $result = @ldap_modify_batch($con, $user_dn, $modify_op);
-        $this->close();
+        $result = $this->setAttribute($uuid, 'unicodePwd', $unicodePwd);
         return $result;
     }
 
