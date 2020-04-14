@@ -207,6 +207,32 @@ class Ldap
         return $result;
     }
 
+    /** This will replace an attribute value,
+     *  it does not use the users credentials,
+     *  bind user must have rights to attribute.
+     *
+     * @param string $uuid The users id
+     * @param string $attribute attribute to be set
+     * @param string $value value to be set
+     * @param string $schema person or group
+     * @return bool Returns result, true or false if changed
+     */
+    public function setAttribute($uuid, $attribute, $value, $schema = 'person') {
+        $this->connect();
+        $con = $this->getLdapConnection();
+        $user_dn = $this->getLdapAttribute($uuid, 'distinguishedname', $schema);
+        $modify_op = [
+            [
+                'attrib'  => $attribute,
+                'modtype' => LDAP_MODIFY_BATCH_REPLACE,
+                'values'  => [$value],
+            ],
+        ];
+        $result = @ldap_modify_batch($con, $user_dn, $modify_op);
+        $this->close();
+        return $result;
+    }
+
     /** This will replace the users password,
      *  it does not use the users credentials,
      *  bind user must have rights.
