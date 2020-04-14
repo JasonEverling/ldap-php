@@ -31,6 +31,9 @@ try {
 // get single attribute value
 // $mail = $AAD->getLdapAttribute('USERNAME', 'mail');
 
+// set new attribute value
+// $mail = $AAD->setAttribute('USERNAME', 'mail', 'somone@example.com');
+
 // get all attributes
 $attributes = $AAD->getLdapAttributes('USERNAME');
 
