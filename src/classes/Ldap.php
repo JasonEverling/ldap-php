@@ -199,12 +199,22 @@ class Ldap
     }
 
     public function getLdapRootDse($attributes = ['*', '+']) {
-        if (!$this->bind){
+        if (!$this->bind) {
             return (false);
         }
         $sr = @ldap_read($this->connection, NULL, 'objectClass=*', $attributes);
         $result = @ldap_get_entries($this->connection, $sr);
         return $result;
+    }
+
+    /** Returns the objects, $uuid, distinguishedName value
+     *
+     * @param string $uuid the objects sAMAccountName
+     * @param string $schema person or group, defaults to person
+     * @return string the objects distinguishedName
+     */
+    public function getObjectDn($uuid, $schema = 'person') {
+        return $this->getLdapAttribute($uuid, 'distinguishedname', $schema);
     }
 
     /** This will replace an attribute value,
@@ -217,10 +227,10 @@ class Ldap
      * @param string $schema person or group
      * @return bool Returns result, true or false if changed
      */
-    public function setAttribute($uuid, $attribute, $value, $schema = 'person') {
+    public function setAttribute($uuid, $attribute, $value) {
         $this->connect();
         $con = $this->getLdapConnection();
-        $user_dn = $this->getLdapAttribute($uuid, 'distinguishedname', $schema);
+        $user_dn = $this->getObjectDn($uuid);
         $modify_op = [
             [
                 'attrib'  => $attribute,
